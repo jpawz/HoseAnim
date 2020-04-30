@@ -169,6 +169,13 @@ void startAction(char* dialog, char* component, ProAppData data)
 	ProMdlCurrentGet(&model);
 	ProMdlToModelitem(model, &modelItem);
 	ProError err = ProParameterInit(&modelItem, paramName, &param);
+
+	ProUIMessageButton* buttons;
+	ProUIMessageButton userChoice;
+	ProArrayAlloc(1, sizeof(ProUIMessageButton),
+		1, (ProArray*)&buttons);
+	buttons[0] = PRO_UI_MESSAGE_OK;
+
 	if (err == PRO_TK_NO_ERROR)
 	{
 		double initialValue, endValue, stepValue;
@@ -179,6 +186,12 @@ void startAction(char* dialog, char* component, ProAppData data)
 		endValue = wcstod(eValue, NULL);
 		ProUIInputpanelValueGet(dialogName, parameter_step_v, &sValue);
 		stepValue = wcstod(sValue, NULL);
+
+		if (stepValue <= 0)
+		{
+			ProUIMessageDialogDisplay(PROUIMESSAGE_INFO, (wchar_t*)L"Blad", (wchar_t*)L"Wartosc kroku musi byc wieksza od 0", buttons, PRO_UI_MESSAGE_ABORT, &userChoice);
+			return;
+		}
 
 		ProPath output_file;
 		ProParamvalue value;
@@ -214,15 +227,11 @@ void startAction(char* dialog, char* component, ProAppData data)
 			}
 			counter++;
 		}
+		ProUIMessageDialogDisplay(PROUIMESSAGE_INFO, (wchar_t*)L"Koniec", (wchar_t*)L"Koniec", buttons, PRO_UI_MESSAGE_ABORT, &userChoice);
 
 	}
 	else
 	{
-		ProUIMessageButton* buttons;
-		ProUIMessageButton userChoice;
-		ProArrayAlloc(1, sizeof(ProUIMessageButton),
-			1, (ProArray*)&buttons);
-		buttons[0] = PRO_UI_MESSAGE_OK;
 		ProUIMessageDialogDisplay(PROUIMESSAGE_INFO, (wchar_t*)L"Blad", (wchar_t*)L"Nieprawidlowy parametr", buttons, PRO_UI_MESSAGE_ABORT, &userChoice);
 	}
 }
