@@ -7,6 +7,8 @@ Creo plugin: makes screenshot after model/assy regeneration for animation purpos
 #include <ProMessage.h>
 #include <ProUICmd.h>
 #include <ProUIDialog.h>
+#include <ProUIInputpanel.h>
+#include <ProUILabel.h>
 #include <ProUIMessage.h>
 #include <ProUIPushbutton.h>
 #include <ProUITextarea.h>
@@ -24,13 +26,21 @@ void makeDialogWindow();
 void initializeMsgFile();
 
 void cancelAction(char*, char*, ProAppData);
+void startAction(char*, char*, ProAppData);
 void screenshotAction(char*, char*, ProAppData);
 
 ProFileName msgFile;
 char dialogName[] = { "Animate" };
+char parameter_l[] = { "Parametr:" };
+char parameter_v[] = { "parametr" };
+char parameter_init_l[] = { "Wartosc poczatkowa:" };
+char parameter_init_v[] = { "init" };
+char parameter_end_l[] = { "Wartosc koncowa:" };
+char parameter_end_v[] = { "end" };
+char parameter_step_l[] = { "Krok:" };
+char parameter_step_v[] = { "step" };
 char cancel[] = { "Cancel" };
-char screenshot[] = { "Zrzut ekranu" };
-
+char start[] = { "Start" };
 
 extern "C" int main(int argc, char** argv)
 {
@@ -82,16 +92,52 @@ void makeDialogWindow()
 	gridOpts.column = 1;
 	gridOpts.horz_resize = PRO_B_FALSE;
 	gridOpts.vert_resize = PRO_B_FALSE;
+
+
+	gridOpts.row = 1;
+	gridOpts.column = 1;
+	ProUIDialogLabelAdd(dialogName, parameter_l, &gridOpts);
+	ProStringToWstring(label[0], parameter_l);
+	ProUILabelTextSet(dialogName, parameter_l, label[0]);
+	gridOpts.column = 2;
+	ProUIDialogInputpanelAdd(dialogName, parameter_v, &gridOpts);
+
+
+	gridOpts.row = 2;
+	gridOpts.column = 1;
+	ProUIDialogLabelAdd(dialogName, parameter_init_l, &gridOpts);
+	ProStringToWstring(label[0], parameter_init_l);
+	ProUILabelTextSet(dialogName, parameter_init_l, label[0]);
+	gridOpts.column = 2;
+	ProUIDialogInputpanelAdd(dialogName, parameter_init_v, &gridOpts);
+
+	gridOpts.row = 3;
+	gridOpts.column = 1;
+	ProUIDialogLabelAdd(dialogName, parameter_end_l, &gridOpts);
+	ProStringToWstring(label[0], parameter_end_l);
+	ProUILabelTextSet(dialogName, parameter_end_l, label[0]);
+	gridOpts.column = 2;
+	ProUIDialogInputpanelAdd(dialogName, parameter_end_v, &gridOpts);
+
+	gridOpts.row = 4;
+	gridOpts.column = 1;
+	ProUIDialogLabelAdd(dialogName, parameter_step_l, &gridOpts);
+	ProStringToWstring(label[0], parameter_step_l);
+	ProUILabelTextSet(dialogName, parameter_step_l, label[0]);
+	gridOpts.column = 2;
+	ProUIDialogInputpanelAdd(dialogName, parameter_step_v, &gridOpts);
+
+	gridOpts.row = 5;
+	gridOpts.column = 1;
 	ProUIDialogPushbuttonAdd(dialogName, cancel, &gridOpts);
 	ProStringToWstring(label[0], cancel);
 	ProUIPushbuttonTextSet(dialogName, cancel, label[0]);
 	ProUIPushbuttonActivateActionSet(dialogName, cancel, cancelAction, NULL);
-
-	gridOpts.row = 2;
-	ProUIDialogPushbuttonAdd(dialogName, screenshot, &gridOpts);
-	ProStringToWstring(label[0], screenshot);
-	ProUIPushbuttonTextSet(dialogName, screenshot, label[0]);
-	ProUIPushbuttonActivateActionSet(dialogName, screenshot, screenshotAction, NULL);
+	gridOpts.column = 2;
+	ProUIDialogPushbuttonAdd(dialogName, start, &gridOpts);
+	ProStringToWstring(label[0], start);
+	ProUIPushbuttonTextSet(dialogName, start, label[0]);
+	ProUIPushbuttonActivateActionSet(dialogName, start, startAction, NULL);
 
 	ProUIDialogActivate(dialogName, &exit_status);
 	ProUIDialogDestroy(dialogName);
@@ -111,6 +157,11 @@ void initializeMsgFile()
 void cancelAction(char* dialog, char* component, ProAppData data)
 {
 	ProUIDialogExit(dialog, 0);
+}
+
+void startAction(char* dialog, char* component, ProAppData data)
+{
+	
 }
 
 void screenshotAction(char* dialog, char* component, ProAppData data)
