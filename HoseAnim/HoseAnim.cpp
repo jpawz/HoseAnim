@@ -1,5 +1,5 @@
 ﻿/**
-Creo plugin: makes screenshot after model/assy regeneration for animation purpose.
+Creo plugin: makes screenshots in a loop after model/assy regeneration and parameter update.
  */
 
 #include <ProCore.h>
