@@ -4,18 +4,14 @@ Creo plugin: makes screenshot after model/assy regeneration for animation purpos
 
 #include <ProCore.h>
 #include <ProMenuBar.h>
-#include <ProMessage.h>
-#include <ProUICmd.h>
 #include <ProUIDialog.h>
 #include <ProUIInputpanel.h>
 #include <ProUILabel.h>
 #include <ProUIMessage.h>
 #include <ProUIPushbutton.h>
-#include <ProUITextarea.h>
 #include <ProUtil.h>
 #include <ProWindows.h>
 #include <ProWstring.h>
-#include <ProWTUtils.h>
 #include <ProParameter.h>
 #include <ProSolid.h>
 #include <vector>
@@ -28,7 +24,6 @@ void initializeMsgFile();
 
 void cancelAction(char*, char*, ProAppData);
 void startAction(char*, char*, ProAppData);
-void screenshotAction(char*, char*, ProAppData);
 
 ProFileName msgFile;
 char dialogName[] = { "Animate" };
@@ -219,16 +214,4 @@ void startAction(char* dialog, char* component, ProAppData data)
 		buttons[0] = PRO_UI_MESSAGE_OK;
 		ProUIMessageDialogDisplay(PROUIMESSAGE_INFO, (wchar_t*)L"Blad", (wchar_t*)L"Nieprawidlowy parametr", buttons, PRO_UI_MESSAGE_ABORT, &userChoice);
 	}
-}
-
-
-void screenshotAction(char* dialog, char* component, ProAppData data)
-{
-	int window_id;
-	ProPath output_file;
-
-	ProWindowCurrentGet(&window_id);
-	ProDirectoryCurrentGet(output_file);
-	ProWstringConcatenate((wchar_t*)L"image.jpg", output_file, 9);
-	ProRasterFileWrite(window_id, PRORASTERDEPTH_24, 5, 4, PRORASTERDPI_300, PRORASTERTYPE_JPEG, output_file);
 }
