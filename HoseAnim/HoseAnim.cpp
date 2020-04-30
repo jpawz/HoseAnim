@@ -24,18 +24,13 @@ void makeDialogWindow();
 void initializeMsgFile();
 
 void cancelAction(char*, char*, ProAppData);
+void screenshotAction(char*, char*, ProAppData);
 
 ProFileName msgFile;
 char dialogName[] = { "Animate" };
 char cancel[] = { "Cancel" };
+char screenshot[] = { "Zrzut ekranu" };
 
-
-vector<wchar_t*> numbers;
-const int textAreaLength = 2048;
-static wchar_t textAreaValue[textAreaLength];
-
-static wstring notExportedNumbers;
-static bool success = true;
 
 extern "C" int main(int argc, char** argv)
 {
@@ -92,6 +87,11 @@ void makeDialogWindow()
 	ProUIPushbuttonTextSet(dialogName, cancel, label[0]);
 	ProUIPushbuttonActivateActionSet(dialogName, cancel, cancelAction, NULL);
 
+	gridOpts.row = 2;
+	ProUIDialogPushbuttonAdd(dialogName, screenshot, &gridOpts);
+	ProStringToWstring(label[0], screenshot);
+	ProUIPushbuttonTextSet(dialogName, screenshot, label[0]);
+	ProUIPushbuttonActivateActionSet(dialogName, screenshot, screenshotAction, NULL);
 
 	ProUIDialogActivate(dialogName, &exit_status);
 	ProUIDialogDestroy(dialogName);
@@ -113,5 +113,13 @@ void cancelAction(char* dialog, char* component, ProAppData data)
 	ProUIDialogExit(dialog, 0);
 }
 
+void screenshotAction(char* dialog, char* component, ProAppData data)
+{
+	int window_id;
+	ProPath output_file;
 
-
+	ProWindowCurrentGet(&window_id);
+	ProDirectoryCurrentGet(output_file);
+	ProWstringConcatenate((wchar_t*)L"image.jpg", output_file, 9);
+	ProRasterFileWrite(window_id, PRORASTERDEPTH_24, 5, 4, PRORASTERDPI_300, PRORASTERTYPE_JPEG, output_file);
+}
