@@ -16,7 +16,7 @@ Creo plugin: makes screenshot after model/assy regeneration for animation purpos
 #include <ProWindows.h>
 #include <ProWstring.h>
 #include <ProWTUtils.h>
-#include <ProPDF.h>
+#include <ProParameter.h>
 #include <vector>
 
 using namespace std;
@@ -161,8 +161,30 @@ void cancelAction(char* dialog, char* component, ProAppData data)
 
 void startAction(char* dialog, char* component, ProAppData data)
 {
-	
+	wchar_t* paramName;
+	ProUIInputpanelValueGet(dialogName, parameter_v, &paramName);
+
+	ProParameter param;
+	ProMdl model;
+	ProModelitem modelItem;
+	ProMdlCurrentGet(&model);
+	ProMdlToModelitem(model, &modelItem);
+	ProError err = ProParameterInit(&modelItem, paramName, &param);
+	if (err == PRO_TK_NO_ERROR)
+	{
+
+	}
+	else
+	{
+		ProUIMessageButton* buttons;
+		ProUIMessageButton userChoice;
+		ProArrayAlloc(1, sizeof(ProUIMessageButton),
+			1, (ProArray*)&buttons);
+		buttons[0] = PRO_UI_MESSAGE_OK;
+		ProUIMessageDialogDisplay(PROUIMESSAGE_INFO, (wchar_t*)L"Blad", (wchar_t*)L"Nieprawidlowy parametr", buttons, PRO_UI_MESSAGE_ABORT, &userChoice);
+	}
 }
+
 
 void screenshotAction(char* dialog, char* component, ProAppData data)
 {
