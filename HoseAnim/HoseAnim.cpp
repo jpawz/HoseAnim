@@ -187,7 +187,7 @@ void startAction(char* dialog, char* component, ProAppData data)
 		int counter = 0;
 		wchar_t suffix[5];
 
-		while (value.value.d_val <= endValue) {
+		while (true) {
 			ProParameterValueSet(&param, &value);
 
 			ProSolidRegenerate((ProSolid)model, PRO_REGEN_NO_FLAGS);
@@ -200,7 +200,18 @@ void startAction(char* dialog, char* component, ProAppData data)
 			ProWstringConcatenate((wchar_t*)L".jpg", output_file, 4);
 			ProRasterFileWrite(window_id, PRORASTERDEPTH_24, 5, 4, PRORASTERDPI_300, PRORASTERTYPE_JPEG, output_file);
 
-			value.value.d_val += stepValue;
+			if (initialValue < endValue)
+			{
+				value.value.d_val += stepValue;
+				if (value.value.d_val > endValue)
+					break;
+			}
+			else
+			{
+				value.value.d_val -= stepValue;
+				if (value.value.d_val < endValue)
+					break;
+			}
 			counter++;
 		}
 
