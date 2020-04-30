@@ -17,6 +17,7 @@ Creo plugin: makes screenshot after model/assy regeneration for animation purpos
 #include <ProWstring.h>
 #include <ProWTUtils.h>
 #include <ProParameter.h>
+#include <ProSolid.h>
 #include <vector>
 
 using namespace std;
@@ -41,6 +42,8 @@ char parameter_step_l[] = { "Krok:" };
 char parameter_step_v[] = { "step" };
 char cancel[] = { "Cancel" };
 char start[] = { "Start" };
+int window_id;
+
 
 extern "C" int main(int argc, char** argv)
 {
@@ -76,6 +79,7 @@ extern "C" void user_terminate()
 
 void makeDialogWindow()
 {
+	ProWindowCurrentGet(&window_id);
 	int exit_status;
 	ProUIDialogCreate(dialogName, NULL);
 	ProUIGridopts gridOpts;
@@ -172,6 +176,38 @@ void startAction(char* dialog, char* component, ProAppData data)
 	ProError err = ProParameterInit(&modelItem, paramName, &param);
 	if (err == PRO_TK_NO_ERROR)
 	{
+		double initialValue, endValue, stepValue;
+		wchar_t* iValue, *eValue, *sValue;
+		ProUIInputpanelValueGet(dialogName, parameter_init_v, &iValue);
+		initialValue = wcstod(iValue, NULL);
+		ProUIInputpanelValueGet(dialogName, parameter_end_v, &eValue);
+		endValue = wcstod(eValue, NULL);
+		ProUIInputpanelValueGet(dialogName, parameter_step_v, &sValue);
+		stepValue = wcstod(sValue, NULL);
+
+		ProPath output_file;
+		ProParamvalue value;
+		value.type = PRO_PARAM_DOUBLE;
+		value.value.d_val = initialValue;
+		int counter = 0;
+		wchar_t suffix[5];
+
+		while (value.value.d_val <= endValue) {
+			ProParameterValueSet(&param, &value);
+
+			ProSolidRegenerate((ProSolid)model, PRO_REGEN_NO_FLAGS);
+			ProWindowRepaint(window_id);
+
+			ProDirectoryCurrentGet(output_file);
+			ProWstringConcatenate((wchar_t*)L"image", output_file, 5);
+			swprintf(suffix, L"%05d", counter);
+			ProWstringConcatenate(suffix, output_file, 5);
+			ProWstringConcatenate((wchar_t*)L".jpg", output_file, 4);
+			ProRasterFileWrite(window_id, PRORASTERDEPTH_24, 5, 4, PRORASTERDPI_300, PRORASTERTYPE_JPEG, output_file);
+
+			value.value.d_val += stepValue;
+			counter++;
+		}
 
 	}
 	else
